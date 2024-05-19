@@ -1,0 +1,11 @@
+{
+  "name": "supertraders",
+  "version": "1.0.0",
+  "description": "superTraders",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Seymanur CURUKCU",
+  "license": "ISC"
+}
