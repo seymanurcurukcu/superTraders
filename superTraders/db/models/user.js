@@ -4,11 +4,11 @@ const bcrypt = require('bcrypt');
 const sequelize = require('../../config/database');
 const AppError = require('../../utils/appError');
 
-class User extends Model {
+class user extends Model {
     static associate(models) {
-        User.hasMany(models.Portfolio, { foreignKey: 'UserID' });
-        User.hasMany(models.Trade, { foreignKey: 'UserID' });
-        User.hasMany(models.UserLot, { foreignKey: 'UserID' });
+        user.hasMany(models.Portfolio, { foreignKey: 'UserID' });
+        user.hasMany(models.Trade, { foreignKey: 'UserID' });
+        user.hasMany(models.UserLot, { foreignKey: 'UserID' });
     }
     
     async setPassword(password, confirmPassword) {
@@ -22,7 +22,7 @@ class User extends Model {
     }
 }
 
-User.init({
+user.init({
     id: {
         allowNull: false,
         autoIncrement: true,
@@ -98,4 +98,4 @@ User.init({
     modelName: 'user',
 });
 
-module.exports = User;
+module.exports = user;

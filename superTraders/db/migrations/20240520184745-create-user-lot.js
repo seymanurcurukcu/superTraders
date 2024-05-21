@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UserLots', {
+    await queryInterface.createTable('UserLot', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -10,16 +10,32 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       UserID: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'user', 
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       ShareId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Share', 
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       TotalNumberOfShare: {
+        allowNull: false,
         type: Sequelize.INTEGER
       },
       TotalBalanceOfShare: {
-        type: Sequelize.DECIMAL
+        allowNull: false,
+        type: Sequelize.DECIMAL(10, 2), 
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +51,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UserLots');
+    await queryInterface.dropTable('UserLot');
   }
 };
