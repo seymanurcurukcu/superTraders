@@ -3,8 +3,9 @@ require('dotenv').config({ path: `${process.cwd()}/.env` });
 
 const catchAsync= require('../superTraders/utils/catchAsync')
 const express= require('express');
-
 const authRouter = require('./route/authRoute');
+const buyRouter = require('./route/buyRoute');
+const sellRouter = require('./route/sellRoute');
 const AppError = require('./utils/appError');
 const { stack } = require('sequelize/lib/utils');
 const globalErrorHandler = require('./controller/errorController');
@@ -14,6 +15,8 @@ app.use(express.json());
 
 
 app.use('/api/v1/auth',authRouter);
+app.use('/api/v1/buys',buyRouter);
+app.use('/api/v1/sell',sellRouter);
 
 app.use(
     '*',
