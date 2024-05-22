@@ -26,6 +26,13 @@ const createbuy = catchAsync(async(req,res,next)=>{
             return next(new AppError('Invalid request', 400));
 
           };
+          if (Lots > share.Lot) {
+            return next(new AppError('Requested lots exceed available share lots', 400));
+        }
+          const totalCost = share.Price * Lots;
+          if (portfolio.TotalBalance < totalCost) {
+            return next(new AppError('You do not have enough funds', 400));
+        }
           const newTrade = await Trade.create({
             UserID,
             ShareId,
@@ -36,17 +43,17 @@ const createbuy = catchAsync(async(req,res,next)=>{
           const userLot = await UserLot.findOne({ where: { UserID, ShareId } });
           if (userLot) {
             userLot.TotalNumberOfShare += Lots;
-            userLot.TotalBalanceOfShare += share.Price * Lots;
+            userLot.TotalBalanceOfShare += totalCost;
             await userLot.save();
           } else {
             await UserLot.create({
               UserID,
               ShareId,
               TotalNumberOfShare: Lots,
-              TotalBalanceOfShare: share.Price * Lots
+              TotalBalanceOfShare: totalCost
             });
           }
-          portfolio.TotalBalance -= share.Price * Lots;
+          portfolio.TotalBalance -= totalCost;
           await portfolio.save();
           return res.status(201).json({
             status:'success',

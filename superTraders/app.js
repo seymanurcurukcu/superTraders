@@ -9,6 +9,7 @@ const sellRouter = require('./route/sellRoute');
 const shareRouter = require('./route/shareRoute');
 const userLotsRouter = require('./route/userLotsRoute');
 const portfolioRouter = require('./route/portfolioRoute');
+const userRouter = require('./route/userRoute');
 
 
 const AppError = require('./utils/appError');
@@ -25,7 +26,7 @@ app.use('/api/v1/sell',sellRouter);
 app.use('/api/v1/share',shareRouter);
 app.use('/api/v1/userLots',userLotsRouter);
 app.use('/api/v1/portfolio',portfolioRouter);
-
+app.use('/api/v1/userList',userRouter);
 
 app.use(
     '*',
