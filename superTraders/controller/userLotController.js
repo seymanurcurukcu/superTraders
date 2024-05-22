@@ -15,4 +15,13 @@ const getAllUserLot = catchAsync(async(req,res,next)=>{
         data:result
     })
 })
-module.exports = { getAllUserLot };
+const getUserLot = catchAsync(async(req,res,next)=>{
+    const UserID = req.user.id;
+
+    const result = await UserLot.findOne({ where: { UserID } });
+    return res.json({
+        status:'success',
+        data:result
+    })
+})
+module.exports = { getAllUserLot, getUserLot };
