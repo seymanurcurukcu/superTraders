@@ -87,7 +87,7 @@ UserLot.init({
   sequelize,
   paranoid: true,
   freezeTableName: true,
-  modelName: 'UserLot ',
+  modelName: 'UserLot',
 });
 
 module.exports = UserLot;

@@ -98,7 +98,7 @@ Trade.init({
   sequelize,
   paranoid: true,
   freezeTableName: true,
-  modelName: 'Trade ',
+  modelName: 'Trade',
 });
 
 module.exports = Trade;
