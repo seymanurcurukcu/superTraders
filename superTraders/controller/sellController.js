@@ -5,6 +5,7 @@ const Trade = require('../db/models/trade');
 const UserLot = require('../db/models/userlot');
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const moment = require('moment');
 
 require('dotenv').config({ path: `${process.cwd()}/.env` });
 
@@ -13,17 +14,32 @@ const createsell = catchAsync(async(req,res,next)=>{
     const UserID = req.user.id;
 
     try{
-        const user = await User.findByPk(UserID);
-        const portfolio = await Portfolio.findOne({ where: { UserID } });
-        const share = await Share.findByPk(ShareId);
-        const userlot = await UserLot.findOne({ where: { UserID, ShareId } });
+      const currentTime = moment();
 
-        if (!user || !portfolio || !share || !userlot || userlot.TotalNumberOfShare < Lots) {
-            return next(new AppError('Invalid request', 400));
-          }
-          if (portfolio.TotalBalance - (share.Price * Lots) < 0) {
-            return next(new AppError('You do not have enough balance to sell these shares', 400));
-        }
+        const user = await User.findByPk(UserID);
+        if (!user) {
+          return next(new AppError('User not found', 400));
+      }
+        const portfolio = await Portfolio.findOne({ where: { UserID } });
+        if (!portfolio) {
+          return next(new AppError('Portfolio not found', 400));
+      }
+        const share = await Share.findByPk(ShareId);
+        if (!share) {
+          return next(new AppError('Share not found', 400));
+      }
+        const userlot = await UserLot.findOne({ where: { UserID, ShareId } });
+        if (!userlot) {
+          return next(new AppError('User lot not found', 400));
+      }
+      if (Lots <= 0) {
+        return next(new AppError('Invalid lot quantity', 400));
+    }
+      if (userlot.TotalNumberOfShare < Lots) {
+        return next(new AppError('You dont have enough shares', 400));
+    }
+          const totalCost = share.Price * Lots;
+
           const newTrade = await Trade.create({
             UserID,
             ShareId,
@@ -32,10 +48,12 @@ const createsell = catchAsync(async(req,res,next)=>{
             BeforePrice: share.Price
           });
           userlot.TotalNumberOfShare -= Lots;
-          userlot.TotalBalanceOfShare -= (share.Price * Lots);
+          userlot.TotalBalanceOfShare -= totalCost;
+          userlot.updatedAt = currentTime;
           await userlot.save();
       
-          portfolio.TotalBalance += (share.Price * Lots);
+          portfolio.TotalBalance += totalCost;
+          portfolio.updatedAt = currentTime;
           await portfolio.save();
           return res.status(201).json({
             status:'success',

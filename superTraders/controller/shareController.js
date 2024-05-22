@@ -1,6 +1,8 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const Share = require("../db/models/share");
+const moment = require('moment');
+
 require('dotenv').config({
     path: `${process.cwd()}/.env`
 });
@@ -9,6 +11,13 @@ require('dotenv').config({
 
 const shareAdd = catchAsync(async (req, res, next) => {
     const { ShareName, ShortShareName, Price, BeforePrice, Lot } = req.body;
+    if (!/^[A-Z]{3}$/.test(ShortShareName)) {
+      return next(new AppError('ShortShareName must be exactly 3 uppercase letters', 400));
+    }
+    if (!/^\d+(\.\d{1,2})?$/.test(Price)) {
+      return next(new AppError('Price must be a decimal number with exactly 2 decimal places', 400));
+    }
+
     try {
         const newShare = await Share.create({
           ShareName,
@@ -36,9 +45,12 @@ const shareAdd = catchAsync(async (req, res, next) => {
 
 const sharePut = catchAsync(async (req, res, next) => {
     const { ShareId, Price } = req.body;
-    try {
         const share = await Share.findByPk(ShareId);
-    
+        const lastUpdatedAt = share.getDataValue('updatedAt');
+        const currentTime = moment();
+        if (currentTime.diff(lastUpdatedAt, 'hours') < 1) {
+          throw new AppError('You can only update the share once per hour', 429);
+        }
         if (!share) {
           return next(new AppError('Share not found', 404));
 
@@ -51,16 +63,14 @@ const sharePut = catchAsync(async (req, res, next) => {
     
         share.BeforePrice = share.Price;
         share.Price = Price;
+        share.updatedAt = currentTime;
         await share.save();
     
         return res.status(201).json({
             status:'success',
             data:share,
         });
-      } catch (error) {
-        return next(new AppError('Internal Server Error', 500));
-
-      }
+    
  
 });
 
