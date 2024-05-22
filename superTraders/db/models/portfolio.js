@@ -73,7 +73,7 @@ Portfolio.init({
   sequelize,
   paranoid: true,
   freezeTableName: true,
-  modelName: 'Portfolio ',
+  modelName: 'Portfolio',
 });
 
 module.exports = Portfolio;

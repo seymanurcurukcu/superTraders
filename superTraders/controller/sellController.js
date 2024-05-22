@@ -9,7 +9,9 @@ const AppError = require("../utils/appError");
 require('dotenv').config({ path: `${process.cwd()}/.env` });
 
 const createsell = catchAsync(async(req,res,next)=>{
-    const { UserID, ShareId, Lots } = req.body;
+    const { ShareId, Lots } = req.body;
+    const UserID = req.user.id;
+
     try{
         const user = await User.findByPk(UserID);
         const portfolio = await Portfolio.findOne({ where: { UserID } });
@@ -19,6 +21,9 @@ const createsell = catchAsync(async(req,res,next)=>{
         if (!user || !portfolio || !share || !userlot || userlot.TotalNumberOfShare < Lots) {
             return next(new AppError('Invalid request', 400));
           }
+          if (portfolio.TotalBalance - (share.Price * Lots) < 0) {
+            return next(new AppError('You do not have enough balance to sell these shares', 400));
+        }
           const newTrade = await Trade.create({
             UserID,
             ShareId,
@@ -27,10 +32,10 @@ const createsell = catchAsync(async(req,res,next)=>{
             BeforePrice: share.Price
           });
           userlot.TotalNumberOfShare -= Lots;
-          userlot.TotalBalanceOfShare -= share.Price * Lots;
+          userlot.TotalBalanceOfShare -= (share.Price * Lots);
           await userlot.save();
       
-          portfolio.TotalBalance += share.Price * Lots;
+          portfolio.TotalBalance += (share.Price * Lots);
           await portfolio.save();
           return res.status(201).json({
             status:'success',

@@ -49,49 +49,48 @@ Share.init({
       },
     }
   },
+ 
   ShortShareName: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
     validate: {
-      notNull: {
-        msg: 'ShortShareName cannot be null',
+      len: {
+        args: [3, 3],
+        msg: 'ShortShareName must be exactly 3 characters long'
       },
-      notEmpty: {
-        msg: 'ShortShareName cannot be empty',
-      },
+      isUppercase: true
     }
   },
   Price: {
-    type: DataTypes.DECIMAL(10, 2), 
+    type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
-    defaultValue: 0.00,
     validate: {
-      notNull: {
-        msg: 'Price cannot be null',
+      isDecimal: {
+        args: true,
+        msg: 'Price must be a decimal number'
       },
-      notEmpty: {
-        msg: 'Price cannot be empty',
-      },
+      min: 0
     }
   },
   BeforePrice: {
-    type: DataTypes.DECIMAL(10, 2), 
+    type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
-    defaultValue: 0.00,
     validate: {
-      notNull: {
-        msg: 'Before Price cannot be null',
+      isDecimal: {
+        args: true,
+        msg: 'BeforePrice must be a decimal number'
       },
-      notEmpty: {
-        msg: 'Before Price cannot be empty',
-      },
+      min: 0
     }
   },
   Lot: {
     type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      min: 1
+    }
   },
-
-
   createdAt: {
     allowNull: false,
     type: DataTypes.DATE,
@@ -109,7 +108,7 @@ Share.init({
   sequelize,
   paranoid: true,
   freezeTableName: true,
-  modelName: 'Share ',
+  modelName: 'Share',
 });
 
 module.exports = Share;

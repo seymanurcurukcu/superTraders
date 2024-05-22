@@ -9,14 +9,21 @@ const AppError = require("../utils/appError");
 require('dotenv').config({ path: `${process.cwd()}/.env` });
 
 const createbuy = catchAsync(async(req,res,next)=>{
-    const { UserID, ShareId, Lots } = req.body;
+    const { ShareId, Lots } = req.body;
+    const UserID = req.user.id;
     try{
         const user = await User.findByPk(UserID);
         const portfolio = await Portfolio.findOne({ where: { UserID } });
         const share = await Share.findByPk(ShareId);
-
+        if(!portfolio){
+          await Portfolio.create({
+            UserID: UserID,
+            TotalBalance: 0,
+            TotalShareBalance: 0
+          });
+        }
         if (!user || !portfolio || !share) {
-            return next(new AppError('IInvalid request', 400));
+            return next(new AppError('Invalid request', 400));
 
           };
           const newTrade = await Trade.create({
