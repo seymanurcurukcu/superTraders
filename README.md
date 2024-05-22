@@ -1,3 +1,5 @@
+The project was prepared with node.js. sequelize ORM was used. PostgreSQL was used as the database.
+
 SUPER TRADERS Install Project
 -----------------------------
 
